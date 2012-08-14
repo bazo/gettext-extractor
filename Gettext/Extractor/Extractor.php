@@ -89,7 +89,7 @@ class Extractor
 		}
 		$this->logHandler = fopen($logToFile, "w");
 		$this->setOutputMode(self::OUTPUT_POT);
-		$this->addFilter('PHP', new GettextExtractor_Filters_PHPFilter());
+		$this->addFilter('PHP', new \Gettext\Extractor\Filters\PHPFilter());
 	}
 
 	/**
@@ -164,8 +164,8 @@ class Extractor
 		}
 		elseif(is_dir($resource))
 		{
-			$iterator = new RecursiveIteratorIterator(
-							new RecursiveDirectoryIterator($resource, RecursiveDirectoryIterator::SKIP_DOTS)
+			$iterator = new \RecursiveIteratorIterator(
+							new \RecursiveDirectoryIterator($resource, \RecursiveDirectoryIterator::SKIP_DOTS)
 			);
 			foreach($iterator as $file)
 			{
