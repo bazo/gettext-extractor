@@ -1,5 +1,5 @@
 <?php
-
+use Gettext\Extractor\Extractor;
 /**
  * Description of FilterTest
  *
@@ -19,27 +19,27 @@ abstract class GettextExtractor_Filters_FilterTest extends PHPUnit_Framework_Tes
 		$this->assertInternalType('array', $messages);
 
 		$this->assertContains(array(
-			GettextExtractor_Extractor::LINE => 2,
-			GettextExtractor_Extractor::SINGULAR => 'A message!'
+			Extractor::LINE => 2,
+			Extractor::SINGULAR => 'A message!'
 		), $messages);
 
 		$this->assertContains(array(
-			GettextExtractor_Extractor::LINE => 3,
-			GettextExtractor_Extractor::SINGULAR => 'Another message!',
-			GettextExtractor_Extractor::CONTEXT => 'context'
+			Extractor::LINE => 3,
+			Extractor::SINGULAR => 'Another message!',
+			Extractor::CONTEXT => 'context'
 		), $messages);
 
 		$this->assertContains(array(
-			GettextExtractor_Extractor::LINE => 4,
-			GettextExtractor_Extractor::SINGULAR => 'I see %d little indian!',
-			GettextExtractor_Extractor::PLURAL => 'I see %d little indians!'
+			Extractor::LINE => 4,
+			Extractor::SINGULAR => 'I see %d little indian!',
+			Extractor::PLURAL => 'I see %d little indians!'
 		), $messages);
 
 		$this->assertContains(array(
-			GettextExtractor_Extractor::LINE => 5,
-			GettextExtractor_Extractor::SINGULAR => 'I see %d little indian!',
-			GettextExtractor_Extractor::PLURAL => 'I see %d little indians!',
-			GettextExtractor_Extractor::CONTEXT => 'context'
+			Extractor::LINE => 5,
+			Extractor::SINGULAR => 'I see %d little indian!',
+			Extractor::PLURAL => 'I see %d little indians!',
+			Extractor::CONTEXT => 'context'
 		), $messages);
 	}
 

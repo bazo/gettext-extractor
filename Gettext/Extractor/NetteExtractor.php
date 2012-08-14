@@ -1,4 +1,7 @@
 <?php
+
+namespace Gettext\Extractor;
+
 /**
  * GettextExtractor
  *
@@ -21,14 +24,16 @@
  * @author Ondřej Vodáček
  * @package Nette Extras
  */
-class GettextExtractor_NetteExtractor extends GettextExtractor_Extractor {
+class Nette extends Extractor
+{
 
 	/**
 	 * Setup mandatory filters
 	 *
 	 * @param string|bool $logToFile
 	 */
-	public function __construct($logToFile = FALSE) {
+	public function __construct($logToFile = FALSE)
+	{
 		parent::__construct($logToFile);
 
 		// Clean up...
@@ -56,7 +61,8 @@ class GettextExtractor_NetteExtractor extends GettextExtractor_Extractor {
 	 *
 	 * @return NetteGettextExtractor
 	 */
-	public function setupForms() {
+	public function setupForms()
+	{
 		$php = $this->getFilter('PHP');
 		$php->addFunction('setText')
 				->addFunction('setEmptyValue')
@@ -87,7 +93,8 @@ class GettextExtractor_NetteExtractor extends GettextExtractor_Extractor {
 	 *
 	 * @return NetteGettextExtractor
 	 */
-	public function setupDataGrid() {
+	public function setupDataGrid()
+	{
 		$php = $this->getFilter('PHP');
 		$php->addFunction('addColumn', 2)
 				->addFunction('addNumericColumn', 2)
@@ -100,4 +107,5 @@ class GettextExtractor_NetteExtractor extends GettextExtractor_Extractor {
 
 		return $this;
 	}
+
 }

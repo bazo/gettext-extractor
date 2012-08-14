@@ -1,4 +1,9 @@
 <?php
+
+namespace Gettext\Extractor\Filters;
+
+use Gettext\Extractor\Extractor;
+
 /**
  * GettextExtractor
  *
@@ -18,7 +23,8 @@
  *
  * @author Ondřej Vodáček
  */
-abstract class GettextExtractor_Filters_AFilter {
+abstract class AFilter
+{
 
 	/** @var array */
 	protected $functions = array();
@@ -32,24 +38,30 @@ abstract class GettextExtractor_Filters_AFilter {
 	 * @param $context int|null
 	 * @return AFilter
 	 */
-	public function addFunction($functionName, $singular = 1, $plural = null, $context = null) {
-		if (!is_int($singular) || $singular <= 0) {
-			throw new InvalidArgumentException('Invalid argument type or value given for paramater $singular.');
+	public function addFunction($functionName, $singular = 1, $plural = null, $context = null)
+	{
+		if(!is_int($singular) || $singular <= 0)
+		{
+			throw new \InvalidArgumentException('Invalid argument type or value given for paramater $singular.');
 		}
-	    $function = array(
-			$singular => GettextExtractor_Extractor::SINGULAR
+		$function = array(
+			$singular => Extractor::SINGULAR
 		);
-		if ($plural !== null) {
-			if (!is_int($plural) || $plural <= 0) {
-				throw new InvalidArgumentException('Invalid argument type or value given for paramater $plural.');
+		if($plural !== null)
+		{
+			if(!is_int($plural) || $plural <= 0)
+			{
+				throw new \InvalidArgumentException('Invalid argument type or value given for paramater $plural.');
 			}
-			$function[$plural] = GettextExtractor_Extractor::PLURAL;
+			$function[$plural] = Extractor::PLURAL;
 		}
-		if ($context !== null) {
-			if (!is_int($context) || $context <= 0) {
-				throw new InvalidArgumentException('Invalid argument type or value given for paramater $context.');
+		if($context !== null)
+		{
+			if(!is_int($context) || $context <= 0)
+			{
+				throw new \InvalidArgumentException('Invalid argument type or value given for paramater $context.');
 			}
-			$function[$context] = GettextExtractor_Extractor::CONTEXT;
+			$function[$context] = Extractor::CONTEXT;
 		}
 		$this->functions[$functionName][] = $function;
 		return $this;
@@ -61,8 +73,9 @@ abstract class GettextExtractor_Filters_AFilter {
 	 * @param $functionName
 	 * @return AFilter
 	 */
-	public function removeFunction($functionName) {
-	    unset($this->functions[$functionName]);
+	public function removeFunction($functionName)
+	{
+		unset($this->functions[$functionName]);
 		return $this;
 	}
 
@@ -71,8 +84,9 @@ abstract class GettextExtractor_Filters_AFilter {
 	 *
 	 * @return AFilter
 	 */
-	public function removeAllFunctions() {
-	    $this->functions = array();
+	public function removeAllFunctions()
+	{
+		$this->functions = array();
 		return $this;
 	}
 
@@ -82,11 +96,12 @@ abstract class GettextExtractor_Filters_AFilter {
 	 * @return string
 	 * @author Matěj Humpál (https://github.com/finwe)
 	 */
-	protected function fixEscaping($string) {
-	    $prime = substr($string, 0, 1);
-	    $string = str_replace('\\' . $prime, $prime, $string);
+	protected function fixEscaping($string)
+	{
+		$prime = substr($string, 0, 1);
+		$string = str_replace('\\' . $prime, $prime, $string);
 
-	    return $string;
+		return $string;
 	}
 
 	/**
@@ -95,13 +110,17 @@ abstract class GettextExtractor_Filters_AFilter {
 	 * @param string $string
 	 * @return string
 	 */
-	protected function stripQuotes($string) {
-	    $prime = substr($string, 0, 1);
-		if ($prime === "'" || $prime === '"') {
-			if (substr($string, -1, 1) === $prime) {
+	protected function stripQuotes($string)
+	{
+		$prime = substr($string, 0, 1);
+		if($prime === "'" || $prime === '"')
+		{
+			if(substr($string, -1, 1) === $prime)
+			{
 				$string = substr($string, 1, -1);
 			}
 		}
 		return $string;
 	}
+
 }

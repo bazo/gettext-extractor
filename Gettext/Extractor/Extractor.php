@@ -1,4 +1,7 @@
 <?php
+
+namespace Gettext\Extractor;
+
 /**
  * GettextExtractor
  *
@@ -20,13 +23,13 @@
  * @author Karel Klima
  * @author Ondřej Vodáček
  */
-class GettextExtractor_Extractor {
+class Extractor
+{
 
 	const LOG_FILE = 'extractor.log';
 	const ESCAPE_CHARS = '"';
 	const OUTPUT_PO = 'PO';
 	const OUTPUT_POT = 'POT';
-
 	const CONTEXT = 'context';
 	const SINGULAR = 'singular';
 	const PLURAL = 'plural';
@@ -74,10 +77,14 @@ class GettextExtractor_Extractor {
 	 *
 	 * @param string|bool $logToFile Bool or path of custom log file
 	 */
-	public function __construct($logToFile = false) {
-		if ($logToFile === false) {
+	public function __construct($logToFile = false)
+	{
+		if($logToFile === false)
+		{
 			$logToFile = 'php://stderr';
-		} elseif (!is_string($logToFile)) { // default log file
+		}
+		elseif(!is_string($logToFile))
+		{ // default log file
 			$logToFile = self::LOG_FILE;
 		}
 		$this->logHandler = fopen($logToFile, "w");
@@ -88,8 +95,9 @@ class GettextExtractor_Extractor {
 	/**
 	 * Close the log hangdler if needed
 	 */
-	public function __destruct() {
-		if (is_resource($this->logHandler))
+	public function __destruct()
+	{
+		if(is_resource($this->logHandler))
 			fclose($this->logHandler);
 	}
 
@@ -98,11 +106,15 @@ class GettextExtractor_Extractor {
 	 *
 	 * @param string $message
 	 */
-	public function log($message) {
-		if (is_resource($this->logHandler)) {
-			fwrite($this->logHandler, $message."\n");
-		} else {
-			echo $message."\n";
+	public function log($message)
+	{
+		if(is_resource($this->logHandler))
+		{
+			fwrite($this->logHandler, $message . "\n");
+		}
+		else
+		{
+			echo $message . "\n";
 		}
 	}
 
@@ -112,7 +124,8 @@ class GettextExtractor_Extractor {
 	 * @param string $message
 	 * @throws Exception
 	 */
-	protected function throwException($message) {
+	protected function throwException($message)
+	{
 		$message = $message ? $message : 'Something unexpected occured. See GettextExtractor log for details';
 		$this->log($message);
 		throw new Exception($message);
@@ -124,11 +137,13 @@ class GettextExtractor_Extractor {
 	 * @param string|array $resource
 	 * @return self
 	 */
-	public function scan($resource) {
+	public function scan($resource)
+	{
 		$this->inputFiles = array();
-		if (!is_array($resource))
+		if(!is_array($resource))
 			$resource = array($resource);
-		foreach ($resource as $item) {
+		foreach($resource as $item)
+		{
 			$this->log("Scanning '$item'");
 			$this->_scan($item);
 		}
@@ -141,17 +156,24 @@ class GettextExtractor_Extractor {
 	 *
 	 * @param string $resource File or directory
 	 */
-	protected function _scan($resource) {
-		if (is_file($resource)) {
+	protected function _scan($resource)
+	{
+		if(is_file($resource))
+		{
 			$this->inputFiles[] = $resource;
-		} elseif (is_dir($resource)) {
+		}
+		elseif(is_dir($resource))
+		{
 			$iterator = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator($resource, RecursiveDirectoryIterator::SKIP_DOTS)
+							new RecursiveDirectoryIterator($resource, RecursiveDirectoryIterator::SKIP_DOTS)
 			);
-			foreach ($iterator as $file) {
+			foreach($iterator as $file)
+			{
 				$this->inputFiles[] = $file->getPathName();
 			}
-		} else {
+		}
+		else
+		{
 			$this->throwException("Resource '$resource' is not a directory or file");
 		}
 	}
@@ -162,31 +184,37 @@ class GettextExtractor_Extractor {
 	 * @param array $inputFiles
 	 * @return array
 	 */
-	protected function _extract($inputFiles) {
+	protected function _extract($inputFiles)
+	{
 		$inputFiles = array_unique($inputFiles);
 		sort($inputFiles);
-		foreach ($inputFiles as $inputFile) {
-			if (!file_exists($inputFile)) {
-				$this->throwException('ERROR: Invalid input file specified: '.$inputFile);
+		foreach($inputFiles as $inputFile)
+		{
+			if(!file_exists($inputFile))
+			{
+				$this->throwException('ERROR: Invalid input file specified: ' . $inputFile);
 			}
-			if (!is_readable($inputFile)) {
-				$this->throwException('ERROR: Input file is not readable: '.$inputFile);
+			if(!is_readable($inputFile))
+			{
+				$this->throwException('ERROR: Input file is not readable: ' . $inputFile);
 			}
 
-			$this->log('Extracting data from file '.$inputFile);
+			$this->log('Extracting data from file ' . $inputFile);
 
 			$fileExtension = pathinfo($inputFile, PATHINFO_EXTENSION);
-			foreach ($this->filters as $extension => $filters) {
+			foreach($this->filters as $extension => $filters)
+			{
 				// Check file extension
-				if ($fileExtension !== $extension)
+				if($fileExtension !== $extension)
 					continue;
 
-				$this->log('Processing file '.$inputFile);
+				$this->log('Processing file ' . $inputFile);
 
-				foreach ($filters as $filterName) {
+				foreach($filters as $filterName)
+				{
 					$filter = $this->getFilter($filterName);
 					$filterData = $filter->extract($inputFile);
-					$this->log('  Filter '.$filterName.' applied');
+					$this->log('  Filter ' . $filterName . ' applied');
 					$this->addMessages($filterData, $inputFile);
 				}
 			}
@@ -200,8 +228,10 @@ class GettextExtractor_Extractor {
 	 * @param string $filterName
 	 * @return GettextExtractor_Filters_IFilter
 	 */
-	public function getFilter($filterName) {
-		if (isset($this->filterStore[$filterName])) {
+	public function getFilter($filterName)
+	{
+		if(isset($this->filterStore[$filterName]))
+		{
 			return $this->filterStore[$filterName];
 		}
 		$this->throwException("ERROR: Filter '$filterName' not found.");
@@ -214,8 +244,9 @@ class GettextExtractor_Extractor {
 	 * @param string $filterName
 	 * @return self
 	 */
-	public function setFilter($extension, $filterName) {
-		if (isset($this->filters[$extension]) && in_array($filterName, $this->filters[$extension]))
+	public function setFilter($extension, $filterName)
+	{
+		if(isset($this->filters[$extension]) && in_array($filterName, $this->filters[$extension]))
 			return $this;
 		$this->filters[$extension][] = $filterName;
 		return $this;
@@ -227,7 +258,8 @@ class GettextExtractor_Extractor {
 	 * @param type $filterName
 	 * @param GettextExtractor_Filters_IFilter $filter
 	 */
-	public function addFilter($filterName, GettextExtractor_Filters_IFilter $filter) {
+	public function addFilter($filterName, Gettext\Extractor\Filters\IFilter $filter)
+	{
 		$this->filterStore[$filterName] = $filter;
 	}
 
@@ -236,7 +268,8 @@ class GettextExtractor_Extractor {
 	 *
 	 * @return self
 	 */
-	public function removeAllFilters() {
+	public function removeAllFilters()
+	{
 		$this->filters = array();
 		return $this;
 	}
@@ -247,7 +280,8 @@ class GettextExtractor_Extractor {
 	 * @param string $value
 	 * @return self
 	 */
-	public function addComment($value) {
+	public function addComment($value)
+	{
 		$this->comments[] = $value;
 		return $this;
 	}
@@ -257,7 +291,8 @@ class GettextExtractor_Extractor {
 	 *
 	 * @param string $key
 	 */
-	public function getMeta($key) {
+	public function getMeta($key)
+	{
 		return isset($this->meta[$key]) ? $this->meta[$key] : NULL;
 	}
 
@@ -268,7 +303,8 @@ class GettextExtractor_Extractor {
 	 * @param string $value
 	 * @return self
 	 */
-	public function setMeta($key, $value) {
+	public function setMeta($key, $value)
+	{
 		$this->meta[$key] = $value;
 		return $this;
 	}
@@ -280,11 +316,13 @@ class GettextExtractor_Extractor {
 	 * @param array $data
 	 * @return self
 	 */
-	public function save($outputFile, $data = null) {
+	public function save($outputFile, $data = null)
+	{
 		$data = $data ? $data : $this->data;
 
 		// Output file permission check
-		if (file_exists($outputFile) && !is_writable($outputFile)) {
+		if(file_exists($outputFile) && !is_writable($outputFile))
+		{
 			$this->throwException('ERROR: Output file is not writable!');
 		}
 
@@ -305,31 +343,39 @@ class GettextExtractor_Extractor {
 	 * @param array $data
 	 * @return string
 	 */
-	protected function formatData($data) {
+	protected function formatData($data)
+	{
 		$output = array();
-		foreach ($this->comments as $comment) {
-			$output[] = '# '.$comment;
+		foreach($this->comments as $comment)
+		{
+			$output[] = '# ' . $comment;
 		}
 		$output[] = '#, fuzzy';
 		$output[] = 'msgid ""';
 		$output[] = 'msgstr ""';
-		$output[] = '"POT-Creation-Date: '.date('c').'\n"';
-		foreach ($this->meta as $key => $value) {
-			$output[] = '"'.$key.': '.$value.'\n"';
+		$output[] = '"POT-Creation-Date: ' . date('c') . '\n"';
+		foreach($this->meta as $key => $value)
+		{
+			$output[] = '"' . $key . ': ' . $value . '\n"';
 		}
 		$output[] = '';
 
-		foreach ($data as $message) {
-			foreach ($message['files'] as $file) {
-				$output[] = '#: '.$file[self::FILE].':'.$file[self::LINE];
+		foreach($data as $message)
+		{
+			foreach($message['files'] as $file)
+			{
+				$output[] = '#: ' . $file[self::FILE] . ':' . $file[self::LINE];
 			}
-			if (isset($message[self::CONTEXT])) {
+			if(isset($message[self::CONTEXT]))
+			{
 				$output[] = $this->formatMessage($message[self::CONTEXT], "msgctxt");
 			}
 			$output[] = $this->formatMessage($message[self::SINGULAR], 'msgid');
-			if (isset($message[self::PLURAL])) {
+			if(isset($message[self::PLURAL]))
+			{
 				$output[] = $this->formatMessage($message[self::PLURAL], 'msgid_plural');
-				switch ($this->outputMode) {
+				switch($this->outputMode)
+				{
 					case self::OUTPUT_POT:
 						$output[] = 'msgstr[0] ""';
 						$output[] = 'msgstr[1] ""';
@@ -340,8 +386,11 @@ class GettextExtractor_Extractor {
 						$output[] = $this->formatMessage($message[self::SINGULAR], 'msgstr[0]');
 						$output[] = $this->formatMessage($message[self::PLURAL], 'msgstr[1]');
 				}
-			} else {
-				switch ($this->outputMode) {
+			}
+			else
+			{
+				switch($this->outputMode)
+				{
 					case self::OUTPUT_POT:
 						$output[] = 'msgstr ""';
 						break;
@@ -364,7 +413,8 @@ class GettextExtractor_Extractor {
 	 * @param string $string
 	 * @return string
 	 */
-	protected function addSlashes($string) {
+	protected function addSlashes($string)
+	{
 		return addcslashes($string, self::ESCAPE_CHARS);
 	}
 
@@ -376,28 +426,35 @@ class GettextExtractor_Extractor {
 	 * @param string $outputMode
 	 * @return string
 	 */
-	public function setOutputMode($outputMode) {
+	public function setOutputMode($outputMode)
+	{
 		$this->outputMode = $outputMode;
 		return $this;
 	}
 
-	protected function addMessages(array $messages, $file) {
-		foreach ($messages as $message) {
+	protected function addMessages(array $messages, $file)
+	{
+		foreach($messages as $message)
+		{
 			$key = '';
-			if (isset($message[self::CONTEXT])) {
+			if(isset($message[self::CONTEXT]))
+			{
 				$key .= $message[self::CONTEXT];
 			}
 			$key .= chr(4);
 			$key .= $message[self::SINGULAR];
 			$key .= chr(4);
-			if (isset($message[self::PLURAL])) {
+			if(isset($message[self::PLURAL]))
+			{
 				$key .= $message[self::PLURAL];
 			}
-			if ($key === chr(4).chr(4)) {
+			if($key === chr(4) . chr(4))
+			{
 				continue;
 			}
 			$line = $message[self::LINE];
-			if (!isset($this->data[$key])) {
+			if(!isset($this->data[$key]))
+			{
 				unset($message[self::LINE]);
 				$this->data[$key] = $message;
 				$this->data[$key]['files'] = array();
@@ -409,9 +466,11 @@ class GettextExtractor_Extractor {
 		}
 	}
 
-	protected function formatMessage($message, $prefix = null) {
+	protected function formatMessage($message, $prefix = null)
+	{
 		$message = $this->addSlashes($message);
 		$message = '"' . str_replace("\n", "\\n\"\n\"", $message) . '"';
-		return ($prefix ? $prefix.' ' : '') . $message;;
+		return ($prefix ? $prefix . ' ' : '') . $message;
 	}
+
 }

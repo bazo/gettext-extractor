@@ -1,4 +1,9 @@
 <?php
+
+namespace Gettext\Extractor\Filters;
+
+use Gettext\Extractor\Extractor;
+
 /**
  * GettextExtractor
  *
@@ -19,34 +24,32 @@
  * @author Karel Klíma
  * @author Ondřej Vodáček
  */
-class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters_AFilter implements GettextExtractor_Filters_IFilter {
-
+class NetteLatteFilter extends AFilter implements IFilter
+{
 	/** @internal single & double quoted PHP string, from Nette\Templates\LatteFilter */
+
 	const RE_STRING = '\'(?:\\\\.|[^\'\\\\])*\'|"(?:\\\\.|[^"\\\\])*"';
 
 	/** @internal PHP identifier, from Nette\Templates\LatteFilter */
 	const RE_IDENTIFIER = '[_a-zA-Z\x7F-\xFF][_a-zA-Z0-9\x7F-\xFF]*';
-
 	const RE_ARGS = '\(.*?\)';
 	const RE_FUNCTION = '__IDENTIFIER____ARGS__(?:->__IDENTIFIER____ARGS__)*'; // Function can return object, so fluent interface is applicable
 	const RE_KEY = '\[.*?\]';
 	const RE_VARIABLE = '\$__IDENTIFIER__(?:__KEY__)*(?:__ARGS__)?(?:->__FUNCTION__)?'; // It's possible to access multidimensional array, variable functions and objects' fluent interface
 	const RE_STATIC = '__IDENTIFIER__(?:::(?:__IDENTIFIER__|__FUNCTION__|__VARIABLE__))?';
-
 	const RE_MODIFIER = '\\s*\|[^|}]+';
-
 	const RE_NUMBER = '\d+';
 
 	/** @link http://doc.nette.org/cs/rozsireni-lattefilter */
 	const RE_TAG = '\{(__MACRO__)\s*(__PARAM__)((?:,\s*__PARAM__)+)?(?:__MODIFIER__)*\}';
-
 
 	protected static $regexForParam;
 
 	/** @var array */
 	protected $prefixes = array();
 
-	public function __construct() {
+	public function __construct()
+	{
 		$this->addFunction('_');
 		$this->addFunction('!_');
 		$this->addFunction('_n', 1, 2);
@@ -67,7 +70,8 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 * @param $context int|null
 	 * @return NetteLatteFilter
 	 */
-	public function addPrefix($prefix, $singular = 1, $plural = null, $context = null) {
+	public function addPrefix($prefix, $singular = 1, $plural = null, $context = null)
+	{
 		parent::addFunction($prefix, $singular, $plural, $context);
 		return $this;
 	}
@@ -79,7 +83,8 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 * @param string $prefix
 	 * @return NetteLatteFilter
 	 */
-	public function removePrefix($prefix) {
+	public function removePrefix($prefix)
+	{
 		parent::removeFunction($prefix);
 		return $this;
 	}
@@ -90,8 +95,9 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 * @param string $file
 	 * @return array
 	 */
-	public function extract($file) {
-		if (count($this->functions) === 0)
+	public function extract($file)
+	{
+		if(count($this->functions) === 0)
 			return;
 		$data = array();
 
@@ -100,11 +106,13 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 		$paramsRegex = str_replace('__PARAM__', $this->createRegexForParam(), $paramsRegex);
 
 		// parse file by lines
-		foreach (file($file) as $line => $contents) {
+		foreach(file($file) as $line => $contents)
+		{
 			$matches = array();
 			preg_match_all($regex, $contents, $matches, PREG_SET_ORDER);
 
-			foreach ($matches as $message) {
+			foreach($matches as $message)
+			{
 				/* $message[0] = complete macro
 				 * $message[1] = prefix
 				 * $message[2] = 1. parameter
@@ -114,18 +122,22 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 				$params = array(
 					1 => $message[2]
 				);
-				if (isset($message[3])) {
+				if(isset($message[3]))
+				{
 					$m = array();
 					preg_match_all($paramsRegex, $message[3], $m, PREG_SET_ORDER);
-					foreach ($m as $index => $match) {
+					foreach($m as $index => $match)
+					{
 						$params[$index + 2] = $match[1];
 					}
 				}
 				$result = array(
-					GettextExtractor_Extractor::LINE => $line + 1
+					Extractor::LINE => $line + 1
 				);
-				foreach ($prefix as $position => $type) {
-					if (!isset($params[$position]) || !$this->isStaticString($params[$position])) {
+				foreach($prefix as $position => $type)
+				{
+					if(!isset($params[$position]) || !$this->isStaticString($params[$position]))
+					{
 						continue 2; // continue with next message
 					}
 					$result[$type] = $this->stripQuotes($this->fixEscaping($params[$position]));
@@ -141,9 +153,11 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 *
 	 * @return string
 	 */
-	private function createRegexForParam() {
-		if (!isset(self::$regexForParam)) {
-			self::$regexForParam = '(?:'.self::RE_NUMBER.'|'.self::RE_STRING.'|'.self::RE_STATIC.'|'.self::RE_VARIABLE.'|'.self::RE_FUNCTION.')';
+	private function createRegexForParam()
+	{
+		if(!isset(self::$regexForParam))
+		{
+			self::$regexForParam = '(?:' . self::RE_NUMBER . '|' . self::RE_STRING . '|' . self::RE_STATIC . '|' . self::RE_VARIABLE . '|' . self::RE_FUNCTION . ')';
 			$replace = array(
 				'__STATIC__' => self::RE_STATIC,
 				'__VARIABLE__' => self::RE_VARIABLE,
@@ -152,9 +166,7 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 				'__KEY__' => self::RE_KEY,
 			);
 			self::$regexForParam = str_replace(
-				array_keys($replace),
-				array_values($replace),
-				self::$regexForParam
+					array_keys($replace), array_values($replace), self::$regexForParam
 			);
 		}
 		return self::$regexForParam;
@@ -166,9 +178,11 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 * @param array $macros
 	 * @return string
 	 */
-	private function createRegex(array $macros) {
+	private function createRegex(array $macros)
+	{
 		$quotedMacros = array();
-		foreach ($macros as $prefix) {
+		foreach($macros as $prefix)
+		{
 			$quotedMacros[] = preg_quote($prefix);
 		}
 		$replace = array(
@@ -178,9 +192,7 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 			'__MODIFIER__' => self::RE_MODIFIER,
 		);
 		$regex = str_replace(
-				array_keys($replace),
-				array_values($replace),
-				self::RE_TAG
+				array_keys($replace), array_values($replace), self::RE_TAG
 		);
 
 		return "/$regex/";
@@ -192,12 +204,15 @@ class GettextExtractor_Filters_NetteLatteFilter extends GettextExtractor_Filters
 	 * @param string $string
 	 * @return bool
 	 */
-	private function isStaticString($string) {
-		$prime = substr($string,0,1);
-		if (($prime === "'" || $prime === '"') && substr($string, -1, 1) === $prime) {
+	private function isStaticString($string)
+	{
+		$prime = substr($string, 0, 1);
+		if(($prime === "'" || $prime === '"') && substr($string, -1, 1) === $prime)
+		{
 			return true;
 		}
 		/** @todo more tests needed: "some$string" "{$object->method()}" */
 		return false;
 	}
+
 }

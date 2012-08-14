@@ -10,7 +10,7 @@ class GettextExtractor_Filters_AFilterTest extends PHPUnit_Framework_TestCase {
 	protected $object;
 
 	protected function setUp() {
-		$this->object = $this->getMockForAbstractClass('GettextExtractor_Filters_AFilter');
+		$this->object = $this->getMockForAbstractClass('Gettext\Extractor\Filters\AFilter');
 	}
 
 	/**
