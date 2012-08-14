@@ -94,10 +94,10 @@ class GettextExtractor_Filters_PHPFilterTest extends GettextExtractor_Filters_Fi
 	public function testMessageWithNewlines()
 	{
 		$messages = $this->object->extract($this->file);
-
+		
 		$this->assertContains(array(
 			Extractor::LINE => 22,
-			Extractor::SINGULAR => "A\nmessage!"
+			Extractor::SINGULAR => "A\r\nmessage!"
 				), $messages);
 	}
 
