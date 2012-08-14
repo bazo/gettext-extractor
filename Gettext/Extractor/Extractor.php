@@ -89,7 +89,7 @@ class Extractor
 		}
 		$this->logHandler = fopen($logToFile, "w");
 		$this->setOutputMode(self::OUTPUT_POT);
-		$this->addFilter('PHP', new \Gettext\Extractor\Filters\PHPFilter());
+		$this->addFilter('PHP', new \Gettext\Extractor\Filters\PHP);
 	}
 
 	/**
@@ -258,7 +258,7 @@ class Extractor
 	 * @param type $filterName
 	 * @param GettextExtractor_Filters_IFilter $filter
 	 */
-	public function addFilter($filterName, Gettext\Extractor\Filters\IFilter $filter)
+	public function addFilter($filterName, \Gettext\Extractor\Filters\IFilter $filter)
 	{
 		$this->filterStore[$filterName] = $filter;
 	}

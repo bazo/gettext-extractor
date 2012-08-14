@@ -18,7 +18,7 @@ use Gettext\Extractor\Extractor;
  * Filter to fetch gettext phrases from PHP functions
  * @author Ondřej Vodáček
  */
-class PHPFilter extends AFilter implements IFilter, \PHPParser_NodeVisitor
+class PHP extends AFilter implements IFilter, \PHPParser_NodeVisitor
 {
 
 	/** @var array */

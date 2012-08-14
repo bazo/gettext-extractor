@@ -24,7 +24,7 @@ use Gettext\Extractor\Extractor;
  * @author Karel Klíma
  * @author Ondřej Vodáček
  */
-class NetteLatteFilter extends AFilter implements IFilter
+class NetteLatte extends AFilter implements IFilter
 {
 	/** @internal single & double quoted PHP string, from Nette\Templates\LatteFilter */
 
@@ -68,7 +68,7 @@ class NetteLatteFilter extends AFilter implements IFilter
 	 * @param $singular int
 	 * @param $plural int|null
 	 * @param $context int|null
-	 * @return NetteLatteFilter
+	 * @return NetteLatte
 	 */
 	public function addPrefix($prefix, $singular = 1, $plural = null, $context = null)
 	{
@@ -81,7 +81,7 @@ class NetteLatteFilter extends AFilter implements IFilter
 	 * Alias for AFilter::removeFunction
 	 *
 	 * @param string $prefix
-	 * @return NetteLatteFilter
+	 * @return NetteLatte
 	 */
 	public function removePrefix($prefix)
 	{

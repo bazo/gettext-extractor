@@ -9,7 +9,7 @@ use Gettext\Extractor\Extractor;
 class GettextExtractor_Filters_NetteLatteFilterTest extends GettextExtractor_Filters_FilterTest {
 
 	protected function setUp() {
-		$this->object = new \Gettext\Extractor\Filters\NetteLatteFilter();
+		$this->object = new \Gettext\Extractor\Filters\NetteLatte;
 		$this->file = dirname(__FILE__) . '/../../data/default.latte';
 	}
 

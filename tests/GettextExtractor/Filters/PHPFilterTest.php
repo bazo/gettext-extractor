@@ -12,7 +12,7 @@ class GettextExtractor_Filters_PHPFilterTest extends GettextExtractor_Filters_Fi
 	protected function setUp()
 	{
 		error_reporting(-1);
-		$this->object = new Gettext\Extractor\Filters\PHPFilter;
+		$this->object = new Gettext\Extractor\Filters\PHP;
 		$this->object->addFunction('addRule', 2);
 		$this->file = dirname(__FILE__) . '/../../data/default.php';
 	}

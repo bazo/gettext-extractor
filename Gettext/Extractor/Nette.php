@@ -46,7 +46,7 @@ class Nette extends Extractor
 				->setFilter('latte', 'PHP')
 				->setFilter('latte', 'NetteLatte');
 
-		$this->addFilter('NetteLatte', new GettextExtractor_Filters_NetteLatteFilter());
+		$this->addFilter('NetteLatte', new \Gettext\Extractor\Filters\NetteLatte);
 
 		$this->getFilter('PHP')
 				->addFunction('translate');
